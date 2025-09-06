@@ -1,1030 +1,132 @@
+@@ -1,109 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ken's RADIO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(-45deg, #1e1e2f, #3b3c59, #282a36, #1e1e2f);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px rgba(255,255,255,0.4);
+    }
+
+    #track-name {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    canvas {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 150px;
+    }
+
+    audio {
+      display: none;
+    }
+
+    #loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      color: #fff;
+      animation: spin 1.5s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    #play-button {
+      font-size: 1.5rem;
+      padding: 10px 20px;
+      background-color: #1DB954;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #play-button:hover {
+      background-color: #1ed760;
+    }
+
+    .fade-in {
+      animation: fadeIn 2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  </style>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ken's Radio - Phonk & Brazilian Funk</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --neon-pink: #ff0080;
-            --neon-cyan: #00ffff;
-            --neon-purple: #8000ff;
-            --neon-green: #39ff14;
-            --neon-yellow: #ffff00;
-            --dark-bg: #0a0a0a;
-            --darker-bg: #050505;
-            --card-bg: rgba(20, 20, 20, 0.9);
-            --border-glow: rgba(255, 0, 128, 0.3);
-            --text-primary: #ffffff;
-            --text-neon: #00ffff;
-            --shadow-neon: 0 0 40px var(--neon-pink), 0 0 80px var(--neon-cyan);
-        }
-
-        body {
-            font-family: 'JetBrains Mono', monospace;
-            background: 
-                radial-gradient(circle at 20% 20%, var(--neon-purple) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, var(--neon-pink) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, var(--neon-cyan) 0%, transparent 50%),
-                linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            animation: backgroundPulse 8s ease-in-out infinite alternate;
-        }
-
-        @keyframes backgroundPulse {
-            0% { filter: hue-rotate(0deg) brightness(1); }
-            100% { filter: hue-rotate(30deg) brightness(1.1); }
-        }
-
-        /* Matrix Rain Effect */
-        .matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.1;
-            pointer-events: none;
-        }
-
-        .matrix-column {
-            position: absolute;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            color: var(--neon-green);
-            text-shadow: 0 0 10px var(--neon-green);
-            white-space: nowrap;
-            animation: matrixFall linear infinite;
-        }
-
-        @keyframes matrixFall {
-            0% { transform: translateY(-100vh); opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
-        }
-
-        /* Floating geometric shapes */
-        .geometric-shapes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3;
-        }
-
-        .shape {
-            position: absolute;
-            border: 2px solid;
-            animation: floatRotate 15s ease-in-out infinite;
-        }
-
-        .triangle {
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-bottom: 35px solid var(--neon-cyan);
-            filter: drop-shadow(0 0 10px var(--neon-cyan));
-        }
-
-        .square {
-            width: 30px;
-            height: 30px;
-            border-color: var(--neon-pink);
-            filter: drop-shadow(0 0 10px var(--neon-pink));
-            animation-delay: -2s;
-        }
-
-        .circle {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            border-color: var(--neon-yellow);
-            filter: drop-shadow(0 0 10px var(--neon-yellow));
-            animation-delay: -4s;
-        }
-
-        @keyframes floatRotate {
-            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-            25% { transform: translateY(-20px) rotate(90deg) scale(1.1); }
-            50% { transform: translateY(-40px) rotate(180deg) scale(0.9); }
-            75% { transform: translateY(-20px) rotate(270deg) scale(1.1); }
-        }
-
-        /* Main Container */
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
-            position: relative;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            animation: neonFlicker 3s ease-in-out infinite alternate;
-        }
-
-        .logo {
-            font-family: 'Orbitron', monospace;
-            font-size: 4rem;
-            font-weight: 900;
-            background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan), var(--neon-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: 
-                0 0 20px var(--neon-pink),
-                0 0 40px var(--neon-cyan),
-                0 0 60px var(--neon-purple);
-            margin-bottom: 1rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-neon);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            letter-spacing: 0.15em;
-            font-weight: 300;
-        }
-
-        @keyframes neonFlicker {
-            0%, 100% { 
-                text-shadow: 
-                    0 0 20px var(--neon-pink),
-                    0 0 40px var(--neon-cyan),
-                    0 0 60px var(--neon-purple);
-            }
-            50% { 
-                text-shadow: 
-                    0 0 10px var(--neon-pink),
-                    0 0 20px var(--neon-cyan),
-                    0 0 30px var(--neon-purple);
-            }
-        }
-
-        /* Player Container */
-        .player-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-            max-width: 90vw;
-            max-height: 90vw;
-        }
-
-        /* Circular Visualizer */
-        .visualizer-ring {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                from 0deg,
-                var(--neon-pink) 0deg,
-                var(--neon-cyan) 90deg,
-                var(--neon-purple) 180deg,
-                var(--neon-green) 270deg,
-                var(--neon-pink) 360deg
-            );
-            animation: rotate 4s linear infinite;
-            filter: blur(2px);
-            opacity: 0.8;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .visualizer-container {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: calc(100% - 20px);
-            height: calc(100% - 20px);
-            border-radius: 50%;
-            overflow: hidden;
-            background: radial-gradient(circle, var(--darker-bg) 30%, transparent 70%);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        #visualizer {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-
-        /* Player Controls */
-        .player-controls {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1rem;
-            z-index: 10;
-            background: radial-gradient(circle, rgba(10, 10, 10, 0.9) 50%, transparent 100%);
-            padding: 2rem;
-            border-radius: 50%;
-        }
-
-        .play-button {
-            width: 80px;
-            height: 80px;
-            border: none;
-            border-radius: 50%;
-            background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan));
-            color: var(--text-primary);
-            font-size: 2rem;
-            cursor: pointer;
-            position: relative;
-            box-shadow: 
-                0 0 20px var(--neon-pink),
-                inset 0 0 20px rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .play-button:hover {
-            transform: scale(1.1);
-            box-shadow: 
-                0 0 30px var(--neon-pink),
-                0 0 50px var(--neon-cyan),
-                inset 0 0 30px rgba(255, 255, 255, 0.2);
-        }
-
-        .play-button:active {
-            transform: scale(0.95);
-        }
-
-        .play-button.playing {
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 20px var(--neon-pink); }
-            50% { box-shadow: 0 0 40px var(--neon-pink), 0 0 60px var(--neon-cyan); }
-        }
-
-        /* Track Info */
-        .track-info {
-            text-align: center;
-            margin-top: 1rem;
-            max-width: 200px;
-        }
-
-        .track-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-neon);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            margin-bottom: 0.5rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .track-artist {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 300;
-        }
-
-        /* Control Panel */
-        .control-panel {
-            position: absolute;
-            bottom: -80px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 1rem;
-            background: var(--card-bg);
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            border: 1px solid var(--border-glow);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .control-btn {
-            width: 45px;
-            height: 45px;
-            border: 2px solid var(--neon-cyan);
-            background: transparent;
-            color: var(--neon-cyan);
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: inherit;
-        }
-
-        .control-btn:hover {
-            background: var(--neon-cyan);
-            color: var(--dark-bg);
-            box-shadow: 0 0 20px var(--neon-cyan);
-            transform: scale(1.1);
-        }
-
-        .control-btn.active {
-            background: var(--neon-pink);
-            border-color: var(--neon-pink);
-            color: var(--text-primary);
-            box-shadow: 0 0 20px var(--neon-pink);
-        }
-
-        /* Volume Control */
-        .volume-container {
-            position: absolute;
-            top: -60px;
-            right: -60px;
-            display: flex;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            border: 1px solid var(--border-glow);
-            backdrop-filter: blur(10px);
-        }
-
-        .volume-slider {
-            width: 80px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            outline: none;
-            cursor: pointer;
-            appearance: none;
-            margin: 0 0.5rem;
-        }
-
-        .volume-slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 12px;
-            height: 12px;
-            background: var(--neon-cyan);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .volume-icon {
-            color: var(--neon-cyan);
-            font-size: 1rem;
-        }
-
-        /* Track List */
-        .track-list {
-            position: absolute;
-            top: 50%;
-            right: -200px;
-            transform: translateY(-50%);
-            background: var(--card-bg);
-            border: 1px solid var(--border-glow);
-            border-radius: 15px;
-            padding: 1rem;
-            width: 180px;
-            backdrop-filter: blur(20px);
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .track-list h3 {
-            color: var(--text-neon);
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-            text-align: center;
-            text-shadow: 0 0 10px var(--neon-cyan);
-        }
-
-        .track-item {
-            padding: 0.5rem;
-            margin: 0.3rem 0;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .track-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--neon-cyan);
-            color: var(--text-primary);
-        }
-
-        .track-item.active {
-            background: linear-gradient(45deg, var(--neon-pink), var(--neon-cyan));
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        /* Loading Animation */
-        .loading {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--darker-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            z-index: 1000;
-            transition: opacity 0.5s ease;
-        }
-
-        .loading.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 3px solid transparent;
-            border-top: 3px solid var(--neon-cyan);
-            border-right: 3px solid var(--neon-pink);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 1rem;
-            box-shadow: 0 0 30px var(--neon-cyan);
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--text-neon);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            animation: blink 1.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes blink {
-            0% { opacity: 1; }
-            100% { opacity: 0.5; }
-        }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            top: 2rem;
-            right: 2rem;
-            background: var(--card-bg);
-            border: 1px solid var(--neon-pink);
-            border-radius: 10px;
-            padding: 1rem 1.5rem;
-            color: var(--text-primary);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 20px var(--neon-pink);
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
-            z-index: 1001;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .player-container {
-                width: 300px;
-                height: 300px;
-            }
-
-            .logo {
-                font-size: 2.5rem;
-            }
-
-            .track-list, .volume-container {
-                position: static;
-                transform: none;
-                margin-top: 2rem;
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .control-panel {
-                position: static;
-                transform: none;
-                margin-top: 2rem;
-            }
-
-            .container {
-                gap: 1rem;
-            }
-        }
-    </style>
+    <title>Radio en ligne</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="favicon.ico" />
 </head>
 <body>
-    <!-- Matrix Background -->
-    <div class="matrix-bg" id="matrixBg"></div>
+  <div id="loader"></div>
+  <h1 class="fade-in">Ken's Radio</h1>
+  <div id="track-name" class="fade-in">Loading...</div>
+  <canvas id="visualizer"></canvas>
+  <audio id="audio"></audio>
 
-    <!-- Geometric Shapes -->
-    <div class="geometric-shapes">
-        <div class="shape triangle" style="top: 10%; left: 10%;"></div>
-        <div class="shape square" style="top: 20%; right: 15%;"></div>
-        <div class="shape circle" style="bottom: 20%; left: 20%;"></div>
-        <div class="shape triangle" style="bottom: 30%; right: 25%;"></div>
-        <div class="shape square" style="top: 60%; left: 60%;"></div>
-        <div class="shape circle" style="top: 40%; right: 40%;"></div>
-    </div>
+  <button id="play-button" class="fade-in">Launch Radio 🎶</button>
 
-    <!-- Loading Screen -->
-    <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <div class="loading-text">LOADING PHONK VIBES...</div>
-    </div>
+  <script src="script.js"></script>
+<body>
+    <div id="loader">Loading...</div>
+    <div id="track-name">🎵 Playing...</div>
+    <button id="play-button">Lauch Radio</button>
+    
+    <!-- Canvas pour l'animation du visualiseur audio -->
+    <canvas id="visualizer"></canvas>
+    
+    <!-- Audio -->
+    <audio id="audio" loop>
+        <source src="assets/audio/track1.mp3" type="audio/mp3">
+        Votre navigateur ne supporte pas la balise audio.
+    </audio>
 
-    <!-- Toast -->
-    <div class="toast" id="toast">
-        <span id="toastMessage"></span>
-    </div>
-
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <h1 class="logo">Ken's Radio</h1>
-            <p class="subtitle">PHONK • BRAZILIAN FUNK • VIBES</p>
-        </header>
-
-        <!-- Player -->
-        <div class="player-container">
-            <!-- Outer Ring -->
-            <div class="visualizer-ring"></div>
-            
-            <!-- Visualizer -->
-            <div class="visualizer-container">
-                <canvas id="visualizer"></canvas>
-            </div>
-
-            <!-- Controls -->
-            <div class="player-controls">
-                <button class="play-button" id="playBtn">▶</button>
-                <div class="track-info">
-                    <div class="track-title" id="trackTitle">Select a track</div>
-                    <div class="track-artist" id="trackArtist">Ken's Radio</div>
-                </div>
-            </div>
-
-            <!-- Volume Control -->
-            <div class="volume-container">
-                <span class="volume-icon">🔊</span>
-                <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80">
-            </div>
-
-            <!-- Control Panel -->
-            <div class="control-panel">
-                <button class="control-btn" id="prevBtn" title="Previous">⏮</button>
-                <button class="control-btn" id="shuffleBtn" title="Shuffle">🔀</button>
-                <button class="control-btn" id="nextBtn" title="Next">⏭</button>
-            </div>
-
-            <!-- Track List -->
-            <div class="track-list">
-                <h3>🎵 PLAYLIST</h3>
-                <div id="trackListContainer"></div>
-            </div>
-        </div>
-    </div>
-
-    <audio id="audio" preload="metadata"></audio>
-
-    <script>
-        class KensPhonkRadio {
-            constructor() {
-                this.audio = document.getElementById('audio');
-                this.playBtn = document.getElementById('playBtn');
-                this.prevBtn = document.getElementById('prevBtn');
-                this.nextBtn = document.getElementById('nextBtn');
-                this.shuffleBtn = document.getElementById('shuffleBtn');
-                this.volumeSlider = document.getElementById('volumeSlider');
-                this.trackTitle = document.getElementById('trackTitle');
-                this.trackArtist = document.getElementById('trackArtist');
-                this.canvas = document.getElementById('visualizer');
-                this.ctx = this.canvas.getContext('2d');
-                this.loading = document.getElementById('loading');
-                this.trackListContainer = document.getElementById('trackListContainer');
-
-                this.isPlaying = false;
-                this.currentTrack = 0;
-                this.isShuffled = false;
-                this.analyser = null;
-                this.audioContext = null;
-                this.source = null;
-
-                // Phonk/Funk tracks from your audio folder
-                this.tracks = [
-                    { file: 'track1.mp3', title: 'PHONK NIGHTS', artist: 'Dark Vibes' },
-                    { file: 'track2.mp3', title: 'BRAZILIAN HEAT', artist: 'Funk Master' },
-                    // Add more tracks as needed
-                ];
-
-                this.init();
-            }
-
-            async init() {
-                this.setupCanvas();
-                this.setupEventListeners();
-                this.createMatrixRain();
-                await this.loadTracks();
-                this.renderTrackList();
-                this.setVolume(80);
-                setTimeout(() => this.hideLoading(), 1500);
-            }
-
-            async loadTracks() {
-                // Try to load tracks from the assets/audio folder
-                const trackPromises = [];
-                
-                for (let i = 1; i <= 10; i++) {
-                    const trackFile = `track${i}.mp3`;
-                    trackPromises.push(this.checkTrackExists(trackFile));
-                }
-
-                const results = await Promise.allSettled(trackPromises);
-                this.tracks = [];
-
-                results.forEach((result, index) => {
-                    if (result.status === 'fulfilled' && result.value) {
-                        this.tracks.push({
-                            file: `track${index + 1}.mp3`,
-                            title: `PHONK TRACK ${index + 1}`,
-                            artist: 'Ken\'s Collection'
-                        });
-                    }
-                });
-
-                if (this.tracks.length === 0) {
-                    // Fallback tracks
-                    this.tracks = [
-                        { file: 'track1.mp3', title: 'PHONK NIGHTS', artist: 'Dark Vibes' },
-                        { file: 'track2.mp3', title: 'BRAZILIAN HEAT', artist: 'Funk Master' }
-                    ];
-                }
-            }
-
-            checkTrackExists(filename) {
-                return new Promise((resolve) => {
-                    const audio = new Audio();
-                    audio.addEventListener('canplaythrough', () => resolve(true));
-                    audio.addEventListener('error', () => resolve(false));
-                    audio.src = `assets/audio/${filename}`;
-                });
-            }
-
-            setupCanvas() {
-                const resizeCanvas = () => {
-                    const container = this.canvas.parentElement;
-                    const size = Math.min(container.offsetWidth, container.offsetHeight);
-                    this.canvas.width = size;
-                    this.canvas.height = size;
-                };
-                
-                resizeCanvas();
-                window.addEventListener('resize', resizeCanvas);
-            }
-
-            setupEventListeners() {
-                this.playBtn.addEventListener('click', () => this.togglePlay());
-                this.prevBtn.addEventListener('click', () => this.previousTrack());
-                this.nextBtn.addEventListener('click', () => this.nextTrack());
-                this.shuffleBtn.addEventListener('click', () => this.toggleShuffle());
-                
-                this.volumeSlider.addEventListener('input', (e) => {
-                    this.setVolume(parseInt(e.target.value));
-                });
-
-                this.audio.addEventListener('ended', () => this.nextTrack());
-                this.audio.addEventListener('loadstart', () => this.showLoading());
-                this.audio.addEventListener('canplaythrough', () => this.hideLoading());
-
-                // Keyboard shortcuts
-                document.addEventListener('keydown', (e) => {
-                    if (e.code === 'Space' && e.target.tagName !== 'INPUT') {
-                        e.preventDefault();
-                        this.togglePlay();
-                    }
-                });
-            }
-
-            setupAudioContext() {
-                if (!this.audioContext) {
-                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    this.analyser = this.audioContext.createAnalyser();
-                    this.analyser.fftSize = 512;
-                    
-                    this.source = this.audioContext.createMediaElementSource(this.audio);
-                    this.source.connect(this.analyser);
-                    this.analyser.connect(this.audioContext.destination);
-                    
-                    this.startCircularVisualizer();
-                }
-            }
-
-            startCircularVisualizer() {
-                const bufferLength = this.analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-                let rotation = 0;
-
-                const draw = () => {
-                    requestAnimationFrame(draw);
-                    
-                    this.analyser.getByteFrequencyData(dataArray);
-                    
-                    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    
-                    const centerX = this.canvas.width / 2;
-                    const centerY = this.canvas.height / 2;
-                    const radius = Math.min(centerX, centerY) * 0.7;
-                    
-                    // Draw circular bars
-                    const bars = 64;
-                    const angleStep = (Math.PI * 2) / bars;
-                    
-                    rotation += 0.02;
-                    
-                    for (let i = 0; i < bars; i++) {
-                        const angle = i * angleStep + rotation;
-                        const amplitude = dataArray[Math.floor(i * bufferLength / bars)] / 255;
-                        const barLength = amplitude * radius * 0.8;
-                        
-                        const startX = centerX + Math.cos(angle) * radius * 0.3;
-                        const startY = centerY + Math.sin(angle) * radius * 0.3;
-                        const endX = centerX + Math.cos(angle) * (radius * 0.3 + barLength);
-                        const endY = centerY + Math.sin(angle) * (radius * 0.3 + barLength);
-                        
-                        // Color gradient based on frequency and amplitude
-                        const hue = (i / bars * 360 + rotation * 50) % 360;
-                        const saturation = 80 + amplitude * 20;
-                        const lightness = 50 + amplitude * 40;
-                        
-                        this.ctx.beginPath();
-                        this.ctx.moveTo(startX, startY);
-                        this.ctx.lineTo(endX, endY);
-                        this.ctx.lineWidth = 3;
-                        this.ctx.strokeStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-                        this.ctx.shadowBlur = 10;
-                        this.ctx.shadowColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-                        this.ctx.stroke();
-                    }
-                    
-                    // Draw center circle
-                    const avgAmplitude = dataArray.reduce((a, b) => a + b) / dataArray.length / 255;
-                    this.ctx.beginPath();
-                    this.ctx.arc(centerX, centerY, radius * 0.2 + avgAmplitude * 20, 0, Math.PI * 2);
-                    this.ctx.fillStyle = `hsla(${(rotation * 100) % 360}, 70%, 60%, 0.3)`;
-                    this.ctx.fill();
-                };
-                
-                draw();
-            }
-
-            async togglePlay() {
-                if (this.isPlaying) {
-                    this.pause();
-                } else {
-                    await this.play();
-                }
-            }
-
-            async play() {
-                try {
-                    if (!this.audio.src) {
-                        this.loadTrack(this.currentTrack);
-                    }
-                    
-                    await this.audio.play();
-                    this.setupAudioContext();
-                    
-                    this.isPlaying = true;
-                    this.playBtn.innerHTML = '⏸';
-                    this.playBtn.classList.add('playing');
-                    
-                    this.showToast('🎵 NOW PLAYING');
-                } catch (error) {
-                    console.error('Playback error:', error);
-                    this.showToast('❌ Playback error');
-                }
-            }
-
-            pause() {
-                this.audio.pause();
-                this.isPlaying = false;
-                this.playBtn.innerHTML = '▶';
-                this.playBtn.classList.remove('playing');
-                this.showToast('⏸ PAUSED');
-            }
-
-            loadTrack(index) {
-                if (index >= 0 && index < this.tracks.length) {
-                    const track = this.tracks[index];
-                    this.audio.src = `assets/audio/${track.file}`;
-                    this.trackTitle.textContent = track.title;
-                    this.trackArtist.textContent = track.artist;
-                    this.currentTrack = index;
-                    this.updateTrackListUI();
-                    this.showToast(`🎵 ${track.title}`);
-                }
-            }
-
-            nextTrack() {
-                let nextIndex;
-                if (this.isShuffled) {
-                    nextIndex = Math.floor(Math.random() * this.tracks.length);
-                } else {
-                    nextIndex = (this.currentTrack + 1) % this.tracks.length;
-                }
-                
-                this.loadTrack(nextIndex);
-                if (this.isPlaying) {
-                    this.play();
-                }
-            }
-
-            previousTrack() {
-                const prevIndex = this.currentTrack === 0 
-                    ? this.tracks.length - 1 
-                    : this.currentTrack - 1;
-                
-                this.loadTrack(prevIndex);
-                if (this.isPlaying) {
-                    this.play();
-                }
-            }
-
-            toggleShuffle() {
-                this.isShuffled = !this.isShuffled;
-                this.shuffleBtn.classList.toggle('active', this.isShuffled);
-                this.showToast(this.isShuffled ? '🔀 SHUFFLE ON' : '🔀 SHUFFLE OFF');
-            }
-
-            setVolume(value) {
-                this.audio.volume = value / 100;
-                
-                const volumeIcon = document.querySelector('.volume-icon');
-                if (value === 0) {
-                    volumeIcon.textContent = '🔇';
-                } else if (value < 50) {
-                    volumeIcon.textContent = '🔉';
-                } else {
-                    volumeIcon.textContent = '🔊';
-                }
-            }
-
-            renderTrackList() {
-                this.trackListContainer.innerHTML = '';
-                this.tracks.forEach((track, index) => {
-                    const trackItem = document.createElement('div');
-                    trackItem.className = 'track-item';
-                    if (index === this.currentTrack) {
-                        trackItem.classList.add('active');
-                    }
-                    
-                    trackItem.innerHTML = `
-                        <div style="font-weight: 600; margin-bottom: 2px;">${track.title}</div>
-                        <div style="font-size: 0.7rem; opacity: 0.7;">${track.artist}</div>
-                    `;
-                    
-                    trackItem.addEventListener('click', () => {
-                        this.loadTrack(index);
-                        if (this.isPlaying) {
-                            this.play();
-                        }
-                    });
-                    
-                    this.trackListContainer.appendChild(trackItem);
-                });
-            }
-
-            updateTrackListUI() {
-                document.querySelectorAll('.track-item').forEach((item, index) => {
-                    item.classList.toggle('active', index === this.currentTrack);
-                });
-            }
-
-            createMatrixRain() {
-                const matrixBg = document.getElementById('matrixBg');
-                const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-                
-                for (let i = 0; i < 20; i++) {
-                    const column = document.createElement('div');
-                    column.className = 'matrix-column';
-                    column.style.left = Math.random() * 100 + '%';
-                    column.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                    column.style.animationDelay = Math.random() * 2 + 's';
-                    
-                    let text = '';
-                    for (let j = 0; j < 20; j++) {
-                        text += chars[Math.floor(Math.random() * chars.length)] + '\n';
-                    }
-                    column.textContent = text;
-                    
-                    matrixBg.appendChild(column);
-                }
-
-                // Refresh matrix rain periodically
-                setInterval(() => {
-                    document.querySelectorAll('.matrix-column').forEach(column => {
-                        let text = '';
-                        for (let j = 0; j < 20; j++) {
-                            text += chars[Math.floor(Math.random() * chars.length)] + '\n';
-                        }
-                        column.textContent = text;
-                    });
-                }, 3000);
-            }
-
-            showLoading() {
-                this.loading.classList.remove('hidden');
-            }
-
-            hideLoading() {
-                this.loading.classList.add('hidden');
-            }
-
-            showToast(message) {
-                const toast = document.getElementById('toast');
-                const toastMessage = document.getElementById('toastMessage');
-                
-                toastMessage.textContent = message;
-                toast.classList.add('show');
-                
-                setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 2500);
-            }
-        }
-
-        // Initialize Ken's Phonk Radio
-        document.addEventListener('DOMContentLoaded', () => {
-            new KensPhonkRadio();
-        });
-
-        // Add some extra visual effects
-        document.addEventListener('mousemove', (e) => {
-            const cursor = document.createElement('div');
-            cursor.style.position = 'fixed';
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursor.style.width = '4px';
-            cursor.style.height = '4px';
-            cursor.style.background = `hsl(${Math.random() * 360}, 70%, 60%)`;
-            cursor.style.borderRadius = '50%';
-            cursor.style.pointerEvents = 'none';
-            cursor.style.zIndex = '9999';
-            cursor.style.filter = 'blur(1px)';
-            cursor.style.opacity = '0.8';
-            
-            document.body.appendChild(cursor);
-            
-            setTimeout(() => {
-                cursor.remove();
-            }, 1000);
-        });
-
-        // Dynamic background color shifts
-        setInterval(() => {
-            const hue = Math.random() * 60; // Random hue shift
-            document.documentElement.style.filter = `hue-rotate(${hue}deg)`;
-            
-            setTimeout(() => {
-                document.documentElement.style.filter = 'none';
-            }, 2000);
-        }, 8000);
-    </script>
+    <script src="script.js"></script>
 </body>
+
 </html>
